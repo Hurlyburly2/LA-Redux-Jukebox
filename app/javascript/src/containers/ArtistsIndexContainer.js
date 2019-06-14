@@ -1,13 +1,19 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
+import { getArtists } from '../modules/playlists'
+
 import ArtistTile from '../components/ArtistTile'
 
 class ArtistsIndexContainer extends Component {
   constructor(props) {
     super(props)
   }
-
+  
+  componentDidMount() {
+    this.props.getArtists()
+  }
+  
   render() {
     const artistTiles = this.props.artists.map(artist => {
       return(
@@ -35,7 +41,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    // Your code here
+    getArtists: () => dispatch(getArtists())
   }
 }
 
