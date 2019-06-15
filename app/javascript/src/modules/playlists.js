@@ -10,10 +10,15 @@ const initialState = {
 
 const playlists = (state = initialState, action) => {
   switch(action.type) {
-    case GET_ARTISTS_REQUEST:
+    case START_NEW_REQUEST:
       return {
         ...state,
         isFetching: true
+      }
+    case REQUEST_FAILED:
+      return {
+        ...state,
+        isFetching: false
       }
     case GET_ARTISTS_REQUEST_SUCCESS:
       const newArtists = state.artists.concat(action.artists)
@@ -22,15 +27,30 @@ const playlists = (state = initialState, action) => {
         isFetching: false,
         artists: newArtists
       }
+    case GET_ARTIST_SONGS_REQUEST_SUCCESS:
+      const newSongs = action.artistSongs
+      const newArtistId = action.selectedArtistId
+      return {
+        ...state,
+        artistSongs: newSongs,
+        selectedArtistId: newArtistId
+      }
     default:
       return state
   }
 }
 
-const GET_ARTISTS_REQUEST = 'GET_ARTISTS_REQUEST'
-const getArtistsRequest = () => {
+const START_NEW_REQUEST = 'START_NEW_REQUEST'
+const startNewRequest = () => {
   return {
-    type: GET_ARTISTS_REQUEST
+    type: START_NEW_REQUEST
+  }
+}
+
+const REQUEST_FAILED = 'REQUEST_FAILED'
+const requestFailed = () => {
+  return {
+    type: REQUEST_FAILED
   }
 }
 
@@ -42,23 +62,16 @@ const getArtistsRequestSuccess = artists => {
   }
 }
 
-const GET_ARTISTS_REQUEST_FAILURE = 'GET_ARTISTS_REQUEST_FAILURE'
-const getArtistsRequestFailure = () => {
-  return {
-    type: GET_ARTISTS_REQUEST_FAILURE
-  }
-}
-
 const getArtists = () => {
   return (dispatch) => {
-    dispatch(getArtistsRequest())
+    dispatch(startNewRequest())
     
     return fetch('/api/v1/artists.json')
       .then(response => {
         if (response.ok) {
           return response.json()
         } else {
-          dispatch(getArtistsRequestFailure())
+          dispatch(requestFailed())
           dispatch(displayAlertMessage("Something went wrong."))
           return { error: 'Something went wrong' }
         }
@@ -71,7 +84,39 @@ const getArtists = () => {
   }
 }
 
+const GET_ARTIST_SONGS_REQUEST_SUCCESS = 'GET_ARTIST_SONGS_REQUEST_SUCCESS'
+const getArtistSongsRequestSuccess = (artistId, artistSongs) => {
+  return {
+    type: GET_ARTIST_SONGS_REQUEST_SUCCESS,
+    selectedArtistId: artistId,
+    artistSongs
+  }
+}
+
+const getArtistSongs = (artistId) => {
+  return (dispatch) => {
+    dispatch(startNewRequest())
+    
+    return fetch(`/api/v1/artists/${artistId}/songs`)
+      .then(response => {
+        if (response.ok) {
+          return response.json()
+        } else {
+          dispatch(requestFailed())
+          dispatch(displayAlertMessage("Something went wrong."))
+          return { error: 'Something went wrong' }
+        }
+      })
+      .then(artistSongs => {
+        if (!artistSongs.error) {
+          dispatch(getArtistSongsRequestSuccess(artistId, artistSongs))
+        }
+      })
+  }
+}
+
 export {
   playlists,
-  getArtists
+  getArtists,
+  getArtistSongs
 }
