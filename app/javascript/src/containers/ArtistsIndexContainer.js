@@ -1,17 +1,22 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
-import { getArtists } from '../modules/playlists'
+import { getArtists, getArtistSongs } from '../modules/playlists'
 
 import ArtistTile from '../components/ArtistTile'
 
 class ArtistsIndexContainer extends Component {
   constructor(props) {
     super(props)
+    this.handleSelect = this.handleSelect.bind(this)
   }
   
   componentDidMount() {
     this.props.getArtists()
+  }
+  
+  handleSelect(event) {
+    this.props.getArtistSongs(event.target.id)
   }
   
   render() {
@@ -19,7 +24,9 @@ class ArtistsIndexContainer extends Component {
       return(
         <ArtistTile
           key={artist.id}
+          id={artist.id}
           artist={artist}
+          handleSelect={this.handleSelect}
         />
       )
     })
@@ -41,7 +48,8 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    getArtists: () => dispatch(getArtists())
+    getArtists: () => dispatch(getArtists()),
+    getArtistSongs: (artistId) => dispatch(getArtistSongs(artistId))
   }
 }
 
