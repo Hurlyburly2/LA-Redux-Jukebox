@@ -3,11 +3,15 @@ import { connect } from 'react-redux'
 
 import SongTile from '../components/SongTile'
 
-// import { addSongToPlaylistPost } from '../modules/playlists'
+import { getExistingPlaylist } from '../modules/playlists'
 
 class PlaylistContainer extends Component {
   constructor(props) {
     super(props)
+  }
+  
+  componentDidMount() {
+    this.props.getExistingPlaylist()
   }
 
   render() {
@@ -39,13 +43,13 @@ const mapStateToProps = (state) => {
   }
 }
 
-// const mapDispatchToProps = (dispatch) => {
-//   return {
-//     addSongToPlaylistPost: (songId) => dispatch(addSongToPlaylistPost(songId))
-//   }
-// }
+const mapDispatchToProps = (dispatch) => {
+  return {
+    getExistingPlaylist: () => dispatch(getExistingPlaylist())
+  }
+}
 
 export default connect(
   mapStateToProps,
-  null
+  mapDispatchToProps
 )(PlaylistContainer)

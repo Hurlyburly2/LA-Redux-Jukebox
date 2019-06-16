@@ -188,7 +188,7 @@ const getExistingPlaylist = () => {
         }
       })
       .then(newPlaylistSongs => {
-        if (!groceries.error) {
+        if (!newPlaylistSongs.error) {
           dispatch(getExistingPlaylistSuccess(newPlaylistSongs))
         }
       })
@@ -199,5 +199,6 @@ export {
   playlists,
   getArtists,
   getArtistSongs,
-  addSongToPlaylistPost
+  addSongToPlaylistPost,
+  getExistingPlaylist
 }
