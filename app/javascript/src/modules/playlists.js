@@ -49,6 +49,13 @@ const playlists = (state = initialState, action) => {
         playlistSongs: action.newPlaylistSongs,
         isFetching: false
       }
+    case REMOVE_SONG_FROM_PLAYLIST_SUCCESS:
+      const songRemovedFromPlaylist = state.playlistSongs.filter ( song => song.id !== action.songId )
+      return {
+        ...state,
+        playlistSongs: songRemovedFromPlaylist,
+        isFetching: false
+      }
     default:
       return state
   }
@@ -195,10 +202,43 @@ const getExistingPlaylist = () => {
   }
 }
 
+const REMOVE_SONG_FROM_PLAYLIST_SUCCESS = 'REMOVE_SONG_FROM_PLAYLIST_SUCCESS'
+const removeSongFromPlaylistSuccess = (songId) => {
+  return {
+    type: REMOVE_SONG_FROM_PLAYLIST_SUCCESS,
+    songId
+  }
+}
+
+const removeSongFromPlaylist = (songId) => {
+  return (dispatch) => {
+    dispatch(startNewRequest())
+    
+    return fetch(`/api/v1/playlist_songs/${songId}`,
+      {
+        method: 'DELETE',
+        body: JSON.stringify(songId),
+        credentials: 'same-origin',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' }
+      }
+    )
+    .then(response => {
+      if (response.ok) {
+        dispatch(removeSongFromPlaylistSuccess(songId))
+      } else {
+        dispatch(requestFailed())
+        dispatch(displayAlertMessage("Something went wrong."))
+        return { error: 'Something went wrong.' }
+      }
+    })
+  }
+}
+
 export {
   playlists,
   getArtists,
   getArtistSongs,
   addSongToPlaylistPost,
-  getExistingPlaylist
+  getExistingPlaylist,
+  removeSongFromPlaylist
 }
