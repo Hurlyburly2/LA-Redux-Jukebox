@@ -133,8 +133,6 @@ const addSongToPlaylistPost = (songId) => {
   return (dispatch) => {
     dispatch(startNewRequest())
     
-    debugger
-    
     return fetch(`/api/v1/songs/${songId}/playlist_songs`,
       {
         method: 'POST',
