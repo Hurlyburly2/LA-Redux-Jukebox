@@ -35,6 +35,12 @@ const playlists = (state = initialState, action) => {
         artistSongs: newSongs,
         selectedArtistId: newArtistId
       }
+    case ADD_SONG_TO_PLAYLIST:
+      const newPlaylistSongs = state.playlistSongs.concat(action.newPlaylistSong)
+      return {
+        ...state,
+        playlistSongs: newPlaylistSongs
+      }
     default:
       return state
   }
@@ -115,8 +121,47 @@ const getArtistSongs = (artistId) => {
   }
 }
 
+const ADD_SONG_TO_PLAYLIST = 'ADD_SONG_TO_PLAYLIST'
+const addSongToPlaylist = (newPlaylistSong) => {
+  return {
+    type: ADD_SONG_TO_PLAYLIST,
+    newPlaylistSong
+  }
+}
+
+const addSongToPlaylistPost = (songId) => {
+  return (dispatch) => {
+    dispatch(startNewRequest())
+    
+    return fetch(`/api/v1/songs/${songId}/playlist_songs`,
+      {
+        method: 'POST',
+        body: JSON.stringify(songId),
+        credentials: 'same-origin',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' }
+      }
+    )
+    .then(response => {
+      if (response.ok) {
+        return response.json()
+      } else {
+        dispatch(requestFailed())
+        dispatch(displayAlertMessage("Something went wrong."))
+        return { error: 'Something went wrong' }
+      }
+    })
+    .then(newPlaylistSong => {
+      if (!newPlaylistSong.error) {
+        dispatch(addSongToPlaylist(newPlaylistSong))
+      }
+    })
+  }
+}
+
+
 export {
   playlists,
   getArtists,
-  getArtistSongs
+  getArtistSongs,
+  addSongToPlaylistPost
 }

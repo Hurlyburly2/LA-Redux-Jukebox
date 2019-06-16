@@ -3,6 +3,8 @@ import { connect } from 'react-redux'
 
 import SongTile from '../components/SongTile'
 
+import { addSongToPlaylistPost } from '../modules/playlists'
+
 class SongsIndexContainer extends Component {
   constructor(props) {
     super(props)
@@ -11,7 +13,7 @@ class SongsIndexContainer extends Component {
   render() {
     const songTiles = this.props.artistSongs.map(song => {
       const addSong = () => {
-        // add your code here
+        this.props.addSongToPlaylistPost(song.id)
       }
       return(
         <SongTile
@@ -38,7 +40,13 @@ const mapStateToProps = state => {
   }
 }
 
+const mapDispatchToProps = (dispatch) => {
+  return {
+    addSongToPlaylistPost: (songId) => dispatch(addSongToPlaylistPost(songId))
+  }
+}
+
 export default connect(
   mapStateToProps,
-  null
+  mapDispatchToProps
 )(SongsIndexContainer)

@@ -3,14 +3,15 @@ import { connect } from 'react-redux'
 
 import SongTile from '../components/SongTile'
 
+// import { addSongToPlaylistPost } from '../modules/playlists'
+
 class PlaylistContainer extends Component {
   constructor(props) {
     super(props)
   }
 
   render() {
-    // change this variable below once this container has access to the `playlistSongs` in state
-    const playlistSongs = []
+    const playlistSongs = this.props.playlistSongs
 
     const songTiles = playlistSongs.map(playlistSong => {
       return(
@@ -32,4 +33,19 @@ class PlaylistContainer extends Component {
   }
 }
 
-export default PlaylistContainer
+const mapStateToProps = (state) => {
+  return {
+    playlistSongs: state.playlists.playlistSongs
+  }
+}
+
+// const mapDispatchToProps = (dispatch) => {
+//   return {
+//     addSongToPlaylistPost: (songId) => dispatch(addSongToPlaylistPost(songId))
+//   }
+// }
+
+export default connect(
+  mapStateToProps,
+  null
+)(PlaylistContainer)
