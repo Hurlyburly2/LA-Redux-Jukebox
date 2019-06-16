@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 
 import SongTile from '../components/SongTile'
 
-import { getExistingPlaylist } from '../modules/playlists'
+import { getExistingPlaylist, removeSongFromPlaylist } from '../modules/playlists'
 
 class PlaylistContainer extends Component {
   constructor(props) {
@@ -18,12 +18,16 @@ class PlaylistContainer extends Component {
     const playlistSongs = this.props.playlistSongs
 
     const songTiles = playlistSongs.map(playlistSong => {
+      const removeSong = () => {
+        this.props.removeSongFromPlaylist(playlistSong.id)
+      }
+      
       return(
         <SongTile
           key={playlistSong.id}
           song={playlistSong.song}
-          // below can be left alone until working on Exceeds functionality
-          handleClick={() => {}}
+          handleClick={removeSong}
+          type="delete"
         />
       )
     })
@@ -45,7 +49,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    getExistingPlaylist: () => dispatch(getExistingPlaylist())
+    getExistingPlaylist: () => dispatch(getExistingPlaylist()),
+    removeSongFromPlaylist: (songId) => dispatch(removeSongFromPlaylist(songId))
   }
 }
 

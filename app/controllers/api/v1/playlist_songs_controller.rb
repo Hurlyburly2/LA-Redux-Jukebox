@@ -19,7 +19,7 @@ class Api::V1::PlaylistSongsController < ApiController
 
   def destroy
     playlist_song = PlaylistSong.find(params[:id])
-
+    
     if playlist_song.destroy
       render json: {}, status: :no_content
     else
