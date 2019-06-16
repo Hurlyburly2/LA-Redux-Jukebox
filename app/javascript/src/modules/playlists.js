@@ -33,13 +33,21 @@ const playlists = (state = initialState, action) => {
       return {
         ...state,
         artistSongs: newSongs,
-        selectedArtistId: newArtistId
+        selectedArtistId: newArtistId,
+        isFetching: false
       }
-    case ADD_SONG_TO_PLAYLIST:
+    case ADD_SONG_TO_PLAYLIST_SUCCESS:
       const newPlaylistSongs = state.playlistSongs.concat(action.newPlaylistSong)
       return {
         ...state,
-        playlistSongs: newPlaylistSongs
+        playlistSongs: newPlaylistSongs,
+        isFetching: false
+      }
+    case GET_EXISTING_PLAYLIST_SUCCESS:
+      return {
+        ...state,
+        playlistSongs: action.newPlaylistSongs,
+        isFetching: false
       }
     default:
       return state
@@ -121,10 +129,10 @@ const getArtistSongs = (artistId) => {
   }
 }
 
-const ADD_SONG_TO_PLAYLIST = 'ADD_SONG_TO_PLAYLIST'
-const addSongToPlaylist = (newPlaylistSong) => {
+const ADD_SONG_TO_PLAYLIST_SUCCESS = 'ADD_SONG_TO_PLAYLIST'
+const addSongToPlaylistSuccess = (newPlaylistSong) => {
   return {
-    type: ADD_SONG_TO_PLAYLIST,
+    type: ADD_SONG_TO_PLAYLIST_SUCCESS,
     newPlaylistSong
   }
 }
@@ -152,12 +160,40 @@ const addSongToPlaylistPost = (songId) => {
     })
     .then(newPlaylistSong => {
       if (!newPlaylistSong.error) {
-        dispatch(addSongToPlaylist(newPlaylistSong))
+        dispatch(addSongToPlaylistSuccess(newPlaylistSong))
       }
     })
   }
 }
 
+const GET_EXISTING_PLAYLIST_SUCCESS = 'GET_EXISTING_PLAYLIST_SUCCESS'
+const getExistingPlaylistSuccess = (newPlaylistSongs) => {
+  return {
+    type: GET_EXISTING_PLAYLIST_SUCCESS,
+    newPlaylistSongs
+  }
+}
+
+const getExistingPlaylist = () => {
+  return (dispatch) => {
+    dispatch(startNewRequest())
+    
+    return fetch('/api/v1/playlist_songs')
+      .then(response => {
+        if(response.ok) {
+          return response.json()
+        } else {
+          dispatch(requestFailed())
+          dispatch(displayAlertMessage("Something went wrong."))
+        }
+      })
+      .then(newPlaylistSongs => {
+        if (!groceries.error) {
+          dispatch(getExistingPlaylistSuccess(newPlaylistSongs))
+        }
+      })
+  }
+}
 
 export {
   playlists,
